@@ -4,6 +4,8 @@ import ConsultationForm from '@/widgets/ConsultationForm';
 import { caller } from '@/trpc/server';
 import Audio from '@/components/audio';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const queryClient = getQueryClient();
   void queryClient.prefetchQuery(
