@@ -16,7 +16,9 @@ export default async function Home() {
   const patients = await caller.patient.list();
 
   // Map of patients
-  const patientsMap = patients.reduce((acc, patient) => {
+  const patientsMap = patients.reduce<{
+    [key: string]: string;
+  }>((acc, patient) => {
     acc[patient.id] = patient.name;
     return acc;
   }, {});

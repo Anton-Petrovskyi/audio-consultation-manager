@@ -1,6 +1,7 @@
 'use server';
 import { caller } from '@/trpc/server';
 import { ActionResponse } from '@/types';
+import { getErrorMessage } from '@/utils/getErrorMsg';
 
 const persistConsultation = async (formData: {
   patientId: string;
@@ -35,7 +36,7 @@ const persistConsultation = async (formData: {
 
     return {
       success: false,
-      message: error.message,
+      message: `${getErrorMessage(error)}`,
     };
   }
 };

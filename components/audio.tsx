@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-export default function Audio({ audioBuffer }: { audioBuffer: ArrayBuffer }) {
+export default function Audio({ audioBuffer }: { audioBuffer: Uint8Array }) {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -15,6 +15,10 @@ export default function Audio({ audioBuffer }: { audioBuffer: ArrayBuffer }) {
       URL.revokeObjectURL(url);
     };
   }, [audioBuffer]);
+
+  if (!audioUrl) {
+    return null;
+  }
 
   return <audio className="h-10" controls src={audioUrl} />;
 }
