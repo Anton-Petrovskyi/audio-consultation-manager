@@ -4,7 +4,11 @@ import { prisma } from '@/server/db';
 
 export const patientRouter = createTRPCRouter({
   list: baseProcedure.query(async () => {
-    const patients = await prisma.patient.findMany();
+    const patients = await prisma.patient.findMany({
+      orderBy: {
+        name: 'asc',
+      },
+    });
     return patients;
   }),
   create: baseProcedure

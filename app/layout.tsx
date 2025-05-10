@@ -13,10 +13,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <TRPCReactProvider>
-      <html lang="en">
-        <body>{children}</body>
-      </html>
-    </TRPCReactProvider>
+    <html lang="en">
+      <body suppressHydrationWarning={true}>
+        <TRPCReactProvider>{children}</TRPCReactProvider>
+      </body>
+    </html>
   );
 }

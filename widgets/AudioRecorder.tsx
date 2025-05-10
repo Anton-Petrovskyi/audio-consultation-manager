@@ -12,7 +12,8 @@ export default function AudioRecorder({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
 
-  const startRecording = async () => {
+  const startRecording = async (e) => {
+    e.preventDefault();
     try {
       // Stop and clean up any existing MediaRecorder instance
       if (mediaRecorderRef.current) {
@@ -48,7 +49,8 @@ export default function AudioRecorder({
     }
   };
 
-  const stopRecording = () => {
+  const stopRecording = (e) => {
+    e.preventDefault();
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       mediaRecorderRef.current.stream
@@ -57,6 +59,13 @@ export default function AudioRecorder({
       mediaRecorderRef.current = null;
     }
     setIsRecording(false);
+
+    // Clean up
+    if (audioURL) {
+      URL.revokeObjectURL(audioURL);
+      setAudioURL(null);
+    }
+    onAudioBlobChange(null);
   };
 
   return (

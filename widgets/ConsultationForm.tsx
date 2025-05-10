@@ -1,30 +1,32 @@
 'use client';
 
 import { useState } from 'react';
-import persistConsultation from '@/actions/persistConsultation';
 import AudioRecorder from './AudioRecorder';
+import { useTRPC } from '@/trpc/client';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 export default function ConsultationForm() {
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const trpc = useTRPC();
+  const { data: patients } = useQuery(trpc.patient.list.queryOptions());
+  const { refetch } = useQuery(trpc.consultation.list.queryOptions());
+  const { mutate: createConsultation } = useMutation(
+    trpc.consultation.create.mutationOptions()
+  );
 
   const [title, setTitle] = useState('');
   const [patientId, setPatientId] = useState('');
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('patientId', patientId);
-    if (audioBlob) {
-      formData.append('audioBlob', audioBlob);
-    }
+    const audioBuffer = new Uint8Array(await audioBlob.arrayBuffer());
+    const consultation = { title, patientId, audioBlob: audioBuffer };
+    createConsultation(consultation, { onSuccess: refetch });
 
-    persistConsultation({
-      title,
-      patientId,
-      audioBlob,
-    });
+    setTitle('');
+    setPatientId('');
+    setAudioBlob(null);
   };
 
   return (
@@ -38,27 +40,33 @@ export default function ConsultationForm() {
         required
         id="title"
         name="title"
-        value={title} // Controlled input
-        onChange={(e) => setTitle(e.target.value)} // Update state on change
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
         placeholder="Title"
         type="text"
       />
-      <input
+
+      <select
         required
         id="patientId"
         name="patientId"
-        value={patientId} // Controlled input
-        onChange={(e) => setPatientId(e.target.value)} // Update state on change
-        placeholder="Patient Id"
-        type="text"
-      />
+        value={patientId}
+        onChange={(e) => setPatientId(e.target.value)}
+        className="border-2 border-gray-800 rounded-lg p-2"
+      >
+        <option value="" disabled>
+          Select a patient
+        </option>
+        {patients?.map((patient) => (
+          <option key={patient.id} value={patient.id}>
+            {patient.name}
+          </option>
+        ))}
+      </select>
 
       <AudioRecorder onAudioBlobChange={setAudioBlob} />
 
-      <button
-        type="submit"
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-200"
-      >
+      <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-200">
         Save
       </button>
     </form>
