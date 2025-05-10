@@ -12,7 +12,7 @@ export default function AudioRecorder({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
 
-  const startRecording = async (e) => {
+  const startRecording = async (e: React.MouseEvent) => {
     e.preventDefault();
     try {
       // Stop and clean up any existing MediaRecorder instance
@@ -49,7 +49,7 @@ export default function AudioRecorder({
     }
   };
 
-  const stopRecording = (e) => {
+  const stopRecording = (e: React.MouseEvent) => {
     e.preventDefault();
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();

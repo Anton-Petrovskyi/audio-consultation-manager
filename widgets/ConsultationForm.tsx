@@ -16,17 +16,23 @@ export default function ConsultationForm() {
   const [title, setTitle] = useState('');
   const [patientId, setPatientId] = useState('');
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [recorderKey, setRecorderKey] = useState(0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!audioBlob || !title || !patientId) {
+      alert('Please fill in all fields and record audio.');
+      return;
+    }
     const audioBuffer = new Uint8Array(await audioBlob.arrayBuffer());
     const consultation = { title, patientId, audioBlob: audioBuffer };
-    createConsultation(consultation, { onSuccess: refetch });
+    createConsultation(consultation, { onSuccess: () => refetch() });
 
     setTitle('');
     setPatientId('');
     setAudioBlob(null);
+    setRecorderKey((prevKey) => prevKey + 1);
   };
 
   return (
@@ -64,7 +70,7 @@ export default function ConsultationForm() {
         ))}
       </select>
 
-      <AudioRecorder onAudioBlobChange={setAudioBlob} />
+      <AudioRecorder key={recorderKey} onAudioBlobChange={setAudioBlob} />
 
       <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-200">
         Save
